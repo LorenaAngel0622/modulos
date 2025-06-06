@@ -3,7 +3,7 @@ session_start();
 
 // Verificación de rol
 if (!isset($_SESSION["usuario"]) || $_SESSION["rol"] !== "admin") {
-    header("Location: login.php");
+    header("Location: login.php?error=No tienes permisos para acceder a esta página");
     exit();
 }
 ?>
@@ -83,10 +83,10 @@ if (!isset($_SESSION["usuario"]) || $_SESSION["rol"] !== "admin") {
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="mostrar.php">Usuarios</a>
+                        <a class="nav-link" href="mostrar.php" aria-label="Ver lista de usuarios">Usuarios</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="logout.php">Cerrar sesión</a>
+                        <a class="nav-link" href="logout.php" aria-label="Cerrar sesión">Cerrar sesión</a>
                     </li>
                 </ul>
             </div>

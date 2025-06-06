@@ -7,7 +7,8 @@ $usuario = null;
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
 
-    $stmt = $conexion->prepare("SELECT * FROM usuario WHERE ID_usuario = ?");
+    // Asegurarse de usar la conexión correcta
+    $stmt = $conn->prepare("SELECT * FROM usuario WHERE ID_usuario = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
 
@@ -30,26 +31,50 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
     $email = $_POST['email'];
     $direccion = $_POST['direccion'];
     $telefono = $_POST['telefono'];
-    $contrasena = $_POST['contrasena'];
+    $contrasena = $_POST['contrasena']; // Verificar si la contraseña se está cifrando
     $rol = $_POST['rol'];
     $fecha_registro = $_POST['fecha_registro'];
 
-    // Aseguramos que el ID se pase correctamente al ejecutar la consulta
-    $stmt = $conexion->prepare("UPDATE usuario SET 
+    // Verificar si la contraseña está vacía
+    if (!empty($contrasena)) {
+        // Si la contraseña se está actualizando, cifrarla
+        $contrasena = password_hash($contrasena, PASSWORD_DEFAULT);
+    } else {
+        // Si no se actualiza la contraseña, no modificarla
+        $contrasena = null;
+    }
+
+    // Preparar la consulta de actualización
+    $query = "UPDATE usuario SET 
         nombre = ?, 
         email = ?, 
         direccion = ?, 
         telefono = ?, 
-        contrasena = ?, 
+        CONTRESENA = ?,
         rol = ?, 
-        fecha_registro = ?
-        WHERE ID_usuario = ?");
+        fecha_registro = ?";
 
-    // Aquí corregimos los parámetros de bind_param: añadimos el tipo adecuado para cada uno
-    $stmt->bind_param("sssssssi", $nombre, $email, $direccion, $telefono, $contrasena, $rol, $fecha_registro, $id);
+    // Solo agregar la actualización de la contraseña si no es null
+    if ($contrasena) {
+        $query .= ", contrasena = ?";
+    }
 
+    $query .= " WHERE ID_usuario = ?";
+
+    // Preparar la consulta
+    $stmt = $conn->prepare($query);
+
+    // Asociar parámetros
+    if ($contrasena) {
+        $stmt->bind_param("sssssssi", $nombre, $email, $direccion, $telefono, $rol, $fecha_registro, $contrasena, $id);
+    } else {
+        $stmt->bind_param("sssssssi", $nombre, $email, $direccion, $telefono, $rol, $fecha_registro, $id);
+    }
+
+    // Ejecutar la consulta
     if ($stmt->execute()) {
-        header("Location: mostrar.php");
+        // Redirigir después de una actualización exitosa
+        header("Location: mostrar.php?id=" . $id);
         exit();
     } else {
         echo "Error al actualizar: " . $stmt->error;
@@ -58,5 +83,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
     $stmt->close();
 }
 
-$conexion->close();
+$conn->close();
 ?>
+

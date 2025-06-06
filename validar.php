@@ -16,11 +16,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($resultado->num_rows > 0) {
         $usuario = $resultado->fetch_assoc();
-
+    
         if (password_verify($contrasena, $usuario["contrasena"])) {
             $_SESSION["usuario"] = $usuario["id_usuario"];
             $_SESSION["rol"] = $usuario["rol"];
-
+    
             // Redirección según rol
             if ($usuario["rol"] === "admin") {
                 header("Location: admin_dashboard.php");
@@ -29,12 +29,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             exit();
         } else {
-            $error = "Contraseña incorrecta.";
+            $error = "Credenciales incorrectas.";
         }
     } else {
-        $error = "Usuario no encontrado.";
+        $error = "Credenciales incorrectas.";
     }
-
+    
     $stmt->close();
     $conn->close();
 }
@@ -80,19 +80,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin-bottom: 20px;
         }
 
-        .mensaje-error {
-            background-color: #ffe0e6;
-            color: #d12f4f;
-            padding: 20px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 500;
-            margin-bottom: 25px;
-            box-shadow: 0 6px 15px rgba(255, 161, 177, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .error-container {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 420px;
+    width: 100%;
+    animation: fadeIn 1s ease-in-out;
+}
+
+.mensaje-error {
+    background-color: #ffe0e6;
+    color: #d12f4f;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 25px;
+    box-shadow: 0 6px 15px rgba(255, 161, 177, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 
         .mensaje-error i {
             font-size: 24px;
